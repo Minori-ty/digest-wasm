@@ -58,7 +58,7 @@
         }
     </style>
     <body>
-        <h2>由于浏览器限制，js的md5测试，只能测2GB的文件</h2>
+        <h2>由于浏览器限制，js的md5测试，只能测2GB的文件.</h2>
         <div class="container">
             <h3>rust-md5:</h3>
             <div class="select">
@@ -133,7 +133,9 @@
             reader.onload = function (e) {
                 const begin = Date.now()
                 const binary = e.target.result
-                const hash = SparkMD5.hashBinary(binary)
+                const spark = new SparkMD5.ArrayBuffer()
+                spark.append(e.target.result)
+                const hash = spark.end()
                 const end = Date.now() - begin
 
                 const uint = (n, s = ' ') => {
