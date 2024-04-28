@@ -156,7 +156,7 @@
                 console.error('文件读取出错: ', e)
             }
 
-            reader.readAsBinaryString(file)
+            reader.readAsArrayBuffer(file)
             const js = document.querySelector('.js')
         })
     </script>
