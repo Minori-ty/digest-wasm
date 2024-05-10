@@ -6,7 +6,7 @@
 
 **[WebAssembly](https://developer.mozilla.org/zh-CN/docs/WebAssembly)**
 
-**[测试地址](https://mllcms.github.io/digest-wasm/)**
+**[测试地址](https://minori-ty.github.io/digest-wasm/)**
 
 ## Install
 
