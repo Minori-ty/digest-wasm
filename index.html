@@ -58,7 +58,6 @@
         }
     </style>
     <body>
-        <h2>由于浏览器限制，js的md5测试，只能测2GB的文件.</h2>
         <div class="container">
             <h3>rust-md5:</h3>
             <div class="select">
@@ -127,6 +126,12 @@
     <script>
         document.getElementById('file-input').addEventListener('change', function (event) {
             const file = event.target.files[0]
+            if (file.size > 2 * 1024 * 1024 * 1024) {
+                // 检查文件是否大于2GB
+                calculateMD5(file) // 计算大文件的MD5
+                return
+            }
+
             const reader = new FileReader()
             let size = file.size
 
@@ -159,5 +164,53 @@
             reader.readAsArrayBuffer(file)
             const js = document.querySelector('.js')
         })
+
+        // 分块读取文件并计算MD5
+        function calculateMD5(file) {
+            const begin = Date.now()
+            let size = file.size
+            const blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice
+            const chunkSize = 2097152 // 分块大小，这里设置为2MB
+            const chunks = Math.ceil(file.size / chunkSize)
+            let currentChunk = 0
+            const spark = new SparkMD5.ArrayBuffer()
+            const fileReader = new FileReader()
+
+            fileReader.onload = function (e) {
+                spark.append(e.target.result) // 将数组缓冲区追加到SparkMD5中
+                currentChunk++
+
+                if (currentChunk < chunks) {
+                    loadNext()
+                } else {
+                    const end = Date.now() - begin
+                    const hash = spark.end() // 完成计算MD5
+                    const js = document.querySelector('.js')
+                    const uint = (n, s = ' ') => {
+                        const _uint = ['KB', 'MB', 'GB', 'TB'].find((_) => (n /= 1024) < 1024)
+                        return n.toFixed(2) + s + _uint
+                    }
+                    js.innerHTML = `
+            <section><span>耗时:</span>${end} ms</section>
+            <section><span>大小:</span>${uint(size)}</section>
+            <section><span>速度:</span>${uint((size / end) * 1000)}/s</section>
+            <section><span>名字:</span>${file.name}</section>
+            <section><span>哈希:</span>${hash}</section>
+            `
+                }
+            }
+
+            fileReader.onerror = function () {
+                console.warn('文件读取错误')
+            }
+
+            function loadNext() {
+                const start = currentChunk * chunkSize
+                const end = start + chunkSize >= file.size ? file.size : start + chunkSize
+                fileReader.readAsArrayBuffer(blobSlice.call(file, start, end))
+            }
+
+            loadNext()
+        }
     </script>
 </html>
