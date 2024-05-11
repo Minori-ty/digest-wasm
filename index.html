@@ -163,11 +163,14 @@
 
             reader.readAsArrayBuffer(file)
             const js = document.querySelector('.js')
+            js.innerHTML = '<div>计算中···</div>'
         })
 
         // 分块读取文件并计算MD5
         function calculateMD5(file) {
             const begin = Date.now()
+            const js = document.querySelector('.js')
+            js.innerHTML = '<div>计算中···</div>'
             let size = file.size
             const blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice
             const chunkSize = 2097152 // 分块大小，这里设置为2MB
@@ -185,7 +188,7 @@
                 } else {
                     const end = Date.now() - begin
                     const hash = spark.end() // 完成计算MD5
-                    const js = document.querySelector('.js')
+
                     const uint = (n, s = ' ') => {
                         const _uint = ['KB', 'MB', 'GB', 'TB'].find((_) => (n /= 1024) < 1024)
                         return n.toFixed(2) + s + _uint
